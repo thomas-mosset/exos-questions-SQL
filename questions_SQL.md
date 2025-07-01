@@ -216,23 +216,60 @@ WHERE price = 20 ;
 
 - **Citer quelques fonctions d’agrégation.**
 
-``COUNT``
-``SUM``
-``AVG``
-``MIN``
-``MAX``
+``COUNT`` : compte toutes les valeurs de toutes les colonnes d'une table.
 
-- **Que fait la clause ``GROUP BY`` ? Peut-on la combiner avec ``ORDER BY ?``**
+``SUM`` : renvoie la somme totale d'une colonne numérique.
 
+``AVG`` : renvoie la valeur moyenne d'une colonne numérique.
 
-- **Peut-on utiliser ``WHERE`` avec ``GROUP BY`` ?**
+``MIN`` : renvoie la valeur minimale d'une colonne numérique.
 
+``MAX`` : renvoie la valeur maximale d'une colonne numérique.
+
+```SQL
+
+SELECT COUNT(Price) FROM Products; -- renvoie le nombre de lignes où Price n'est pas NULL
+
+SELECT SUM(Price) FROM Products; -- renvoie la somme des prix
+
+SELECT AVG(Price) FROM Products; -- renvoie la moyenne des prix
+
+SELECT MIN(Price) FROM Products; -- renvoie le prix minimum
+
+SELECT MAX(Price) FROM Products; -- renvoie le prix maximum
+
+```
+
+- **Que fait la clause ``GROUP BY`` ?**
+
+La clause ``GROUP BY`` regroupe les lignes selon une ou plusieurs colonnes, ce qui permet d’agréger les données par groupe.
+
+```SQL
+
+SELECT COUNT(CustomerID), Country
+FROM Customers
+GROUP BY Country
+ORDER BY COUNT(CustomerID) DESC;
+
+-- Renvoie le nombre de clients par pays, trié par nombre de clients décroissant
+
+```
 
 - **Quelle est la différence entre ``COUNT(*)`` et ``COUNT(colonne)`` ?**
 
+``COUNT(*)`` compte toutes les lignes (y compris celles avec des valeurs NULL dans les colonnes).
 
-- **À quoi sert ``HAVING`` ? Quelle est la différence avec ``WHERE`` ?**
+``COUNT(colonne)`` compte uniquement les lignes où la colonne spécifiée n’est pas NULL.
 
+```SQL
+
+SELECT COUNT(*) FROM products;
+-- Renvoie le nombre total de colonnes de la table produits
+
+SELECT COUNT(product_name) FROM products;
+-- Renvoie le nombre total de produits où product_name n'est pas NULL.
+
+```
 
 ## Sous-requêtes
 
