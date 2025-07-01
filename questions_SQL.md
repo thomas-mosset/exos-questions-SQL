@@ -196,21 +196,95 @@ WHERE price = 20 ;
 
 - **Quelle est la différence entre ``INNER JOIN``, ``LEFT JOIN``, ``RIGHT JOIN`` et ``FULL OUTER JOIN`` ?**
 
+``INNER JOIN`` renvoie uniquement les enregistrements ayant des correspondances dans les deux tables.
+
+``LEFT JOIN`` renvoie tous les enregistrements de la table de gauche, et les enregistrements correspondants de la table de droite. Si aucune correspondance n’est trouvée, les colonnes de la table de droite auront la valeur NULL.
+
+``RIGHT JOIN`` renvoie tous les enregistrements de la table de droite, et ceux correspondants de la table de gauche. Si aucune correspondance n’est trouvée, les colonnes de la table de gauche auront la valeur NULL.
+
+``FULL OUTER JOIN`` renvoie tous les enregistrements des deux tables. Si une correspondance existe, elle est affichée. Sinon, les colonnes de la table sans correspondance sont NULL.
+
+```SQL
+
+-- INNER JOIN : Produits associés à une catégorie
+SELECT ProductID, ProductName, CategoryName
+FROM Products
+INNER JOIN Categories ON Products.CategoryID = Categories.CategoryID;
+
+-- LEFT JOIN : Tous les clients, même ceux sans commande
+SELECT Customers.CustomerName, Orders.OrderID
+FROM Customers
+LEFT JOIN Orders ON Customers.CustomerID = Orders.CustomerID
+ORDER BY Customers.CustomerName;
+
+-- RIGHT JOIN : Tous les employés, même ceux sans commande attribuée
+SELECT Orders.OrderID, Employees.LastName, Employees.FirstName
+FROM Orders
+RIGHT JOIN Employees ON Orders.EmployeeID = Employees.EmployeeID
+ORDER BY Orders.OrderID;
+
+-- FULL OUTER JOIN : Tous les clients et toutes les commandes, même sans correspondance
+SELECT Customers.CustomerName, Orders.OrderID
+FROM Customers
+FULL OUTER JOIN Orders ON Customers.CustomerID=Orders.CustomerID
+ORDER BY Customers.CustomerName;
+
+```
 
 - **À quoi sert la clause ``ON`` dans une jointure ?**
 
+La clause ``ON`` permet de définir la condition de jointure, c’est-à-dire la ou les colonnes sur lesquelles les deux tables doivent être liées. Elle est obligatoire dans une jointure explicite.
+
+```SQL
+
+SELECT * 
+FROM Orders
+INNER JOIN Customers ON Orders.CustomerID = Customers.CustomerID;
+
+```
 
 - **Que fait la clause ``USING`` ?**
 
+La clause ``USING`` permet de simplifier l’écriture d’une condition de jointure lorsque les colonnes ont le même nom dans les deux tables.
+
+*Remarque : ``USING`` ne fonctionne que si le nom de la colonne est identique dans les deux tables.*
+
+```SQL
+
+SELECT * 
+FROM Orders
+JOIN Customers USING (CustomerID);
+
+```
 
 - **Peut-on faire une jointure sur plusieurs colonnes ?**
 
+Oui. Il est possible d’utiliser plusieurs colonnes pour effectuer une jointure.
+
+```SQL
+
+SELECT * FROM TableA
+JOIN TableB
+ON TableA.col1 = TableB.col1 AND TableA.col2 = TableB.col2;
+
+```
 
 - **Peut-on imbriquer plusieurs jointures dans une même requête ?**
 
+Oui, on peut chaîner plusieurs jointures pour relier plusieurs tables.
+
+```SQL
+
+SELECT Orders.OrderID, Customers.CustomerName, Employees.LastName
+FROM Orders
+JOIN Customers ON Orders.CustomerID = Customers.CustomerID
+JOIN Employees ON Orders.EmployeeID = Employees.EmployeeID;
+
+```
 
 - **Que se passe-t-il si une condition de jointure est absente ?**
 
+Si tu oublies la condition ``ON``, le SGBD (Système de gestion de base de données) effectue un produit cartésien. C'est-à-dire que chaque ligne de la première table est combinée avec chaque ligne de la seconde. (Si la première table contient ``m`` lignes et la deuxième ``n`` lignes, alors le résultat contiendra ``m × n`` lignes.) Cela peut produire un très grand nombre de lignes, souvent de manière involontaire.
 
 ## Agrégats et groupes
 
