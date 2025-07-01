@@ -35,4 +35,4 @@ Chaque question est posée de manière simple et directe, pour favoriser la réf
 
 ## Bonus
 
-Ces questions sont conçues pour être utilisées avec n’importe quel SGBD relationnel (PostgreSQL, MySQL, SQLite, etc).
+Ces questions sont conçues pour être utilisées avec n’importe quel SGBD (Système de gestion de base de données) relationnel (PostgreSQL, MySQL, SQLite, etc).
