@@ -349,28 +349,163 @@ SELECT COUNT(product_name) FROM products;
 
 - **Qu’est-ce qu’une sous-requête ? Où peut-on l’utiliser ?**
 
+Une sous-requête (ou requête imbriquée) est une requête SQL insérée à l'intérieur d'une autre requête, généralement dans les clauses ``WHERE``, ``FROM`` ou ``SELECT``.
+
+Elle est souvent utilisée pour comparer une valeur à un résultat calculé (``WHERE`` / ``HAVING``), filtrer selon un ensemble (``IN``) ou ajouter des colonnes calculées (``SELECT``).
+
+```SQL
+
+SELECT * FROM employee
+WHERE salary > (
+    SELECT avg(salary)
+    FROM employee
+);
+-- Renvoie les employé·es gagnant plus que le salaire moyen
+
+```
 
 - **Quelle est la différence entre une sous-requête corrélée et non corrélée ?**
 
+Une sous-requête non corrélée s'exécute indépendamment de la requête principale et est évaluée 1 seule fois.
+
+Une sous-requête corrélée dépend de la requête principale et est réévaluée à chaque ligne de la requête externe. Elle contient une référence à une colonne de la requête principale.
+
+```SQL
+
+SELECT 
+  e1.firstname,
+  e1.lastname,
+  e1.salary,
+  (
+    SELECT AVG(e2.salary)
+    FROM employee e2
+    WHERE e2.dep_id = e1.dep_id
+  ) AS avg_dept_salary
+FROM employee e1;
+-- Renvoie la moyenne des salaires par département
+-- Ici, la sous-requête dépend du département de chaque employé. La moyenne est recalculée pour chaque département.
+
+```
 
 - **À quoi sert l’opérateur ``IN`` dans une sous-requête ?**
 
+L'opérateur ``IN`` permet de filtrer les lignes dont une valeur correspond à l'une des valeurs retournées dans une sous-requête.
+
+```SQL
+
+SELECT product_name
+FROM products
+WHERE category_id IN (
+    SELECT category_id
+    FROM categories
+    WHERE category_name IN ('Electronics', 'Books')
+);
+-- Renvoie tous les produits dont la catégorie est parmi celles ayant pour nom "Electronics" ou "Books".
+
+```
 
 - **Quelle est la différence entre ``EXISTS``, ``IN`` et ``= (SELECT...)`` ?**
 
+``EXISTS`` vérifie si la sous-requête retourne au moins une ligne. Ne regarde pas le contenu, juste la présence.
+
+``IN`` vérifie si une valeur est dans une liste de résultats. C'est utile avec une sous-requête qui retourne plusieurs lignes, une colonne.
+
+``= (SELECT...)`` est utilisé si la sous-requête retourne une seule valeur (une seule ligne, une seule colonne). On est sur une comparaison directe.
+
+```SQL
+
+SELECT * 
+FROM employee 
+WHERE dep_id IN (
+  SELECT dep_id 
+  FROM department 
+  WHERE location = 'Paris'
+);
+-- Renvoie tous les employés dans un département précis de Paris
+
+SELECT * 
+FROM customer
+WHERE EXISTS (
+  SELECT 1
+  FROM orders
+  WHERE orders.customer_id = customer.customer_id
+);
+-- Renvoie tous les clients ayant passé au moins une commande
+
+SELECT * 
+FROM employee 
+WHERE salary = (
+  SELECT AVG(salary) 
+  FROM employee
+);
+-- Renvoie tous les employés gagnant exactement le salaire moyen
+
+```
 
 ## Modélisation et structure
 
 - **Qu’est-ce qu’une clé primaire ?**
 
+Une clé primaire (``pk`` pour ``primary key``) est un identifiant unique pour chaque ligne d'une table. Elle est obligatoire, unique (pas de doublon) et ne peut avoir pour valeur ``NULL``. Elle permet d’identifier de manière fiable une ligne dans une table
+
+```SQL
+
+CREATE TABLE `users` (
+    `user_id` INT NOT NULL AUTO_INCREMENT,
+    `nom` VARCHAR(50),
+    `email` VARCHAR(50),
+    `date_inscription` DATE,
+    PRIMARY KEY (`user_id`)
+);
+
+```
+
 - **Qu’est-ce qu’une clé étrangère ?**
+
+Une clé étrangère (``fk`` pour ``foreign key``) est un champ (ou groupe de champs) dans une table qui référence la clé primaire ``pk`` d'une autre table. Elle établit une relation entre deux tables.
+
+```SQL
+
+CREATE TABLE Orders (
+    order_id INT NOT NULL,
+    order_number INT NOT NULL,
+    user_id INT,
+    PRIMARY KEY (order_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+```
 
 - **Qu’est-ce qu’un index ? Et pourquoi en créer un ?**
 
+Un index est une structure de données qui accélère les recherches dans une table (de manière similaire à l’index d’un livre).
+
+```SQL
+
+CREATE INDEX idx_email ON users(email);
+
+```
+
 - **Que fait ``AUTO_INCREMENT`` ou ``SERIAL`` ?**
+  
+``AUTO_INCREMENT`` (avec MySQL) ou ``SERIAL`` (avec PostgreSQL) permet de générer automatiquement des identifiants uniques en incrémentant une valeur à chaque nouvelle ligne. Cela garantit des valeurs croissantes sans saisie manuelle.
+
+```SQL
+
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    ...
+);
+
+```
 
 - **Quelle est la différence entre ``VARCHAR`` et ``TEXT`` ?**
+  
+``VARCHAR`` et ``TEXT`` sont deux types de données utilisés pour stocker du texte en BDD.
 
+``VARCHAR(n)`` est utilisé pour stocker des chaînes de caractères dont la longueur maximale est connue et/ou limitée. On doit spécifier une taille maximale ``(n)`` (ex: ``VARCHAR(100)``) pour une chaîne de 100 caractères maximum. Ce type est très courant pour les noms, titres, etc. Le contenu est stocké directement dans la ligne de la table, ce qui rend les accès rapides. ``VARCHAR`` peut également être indexé, ce qui permet d’optimiser les recherches sur cette colonne.
+
+``TEXT`` est destiné, quant à lui, à des contenus textuels beaucoup plus longs comme des descriptions, des commentaires ou des articles par exemple. Il comporte des variantes selon le nombre de caractères nécessaires (``MEDIUMTEXT``, ``LONGTEXT``). Contrairement à ``VARCHAR``, les champs de type ``TEXT`` sont souvent stockés à part de la ligne principale de la table, ce qui peut ralentir légèrement l'accès. De plus, ``TEXT`` ne peut pas être entièrement indexé, ce qui peut limiter certaines opérations (comme les tris ou recherches complexes).
 
 ## Création, modification et contraintes
 
