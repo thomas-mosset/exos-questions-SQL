@@ -511,24 +511,103 @@ CREATE TABLE users (
 
 - **Comment créer une table avec ``CREATE TABLE`` ?**
 
+Pour créer une table, on utilise  ``CREATE TABLE`` suivi du nom de la table, puis on définit les colonnes et leurs types. On peut aussi ajouter des contraintes comme une clé primaire (``PRIMARY KEY``) ou une clé étrangère (``FOREIGN KEY``).
+
+```SQL
+
+CREATE TABLE Orders (
+    order_id INT NOT NULL,
+    order_number INT NOT NULL,
+    user_id INT,
+    PRIMARY KEY (order_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+-- Ici, user_id fait référence à la colonne user_id de la table users.
+
+```
 
 - **Comment modifier une table avec ``ALTER TABLE`` ?**
 
+L'instruction ``ALTER TABLE`` permet d'ajouter, de supprimer ou de modifier une colonne dans une table existante. Elle permet également d'ajouter et de supprimer une contrainte sur une table existante.
 
-- **Qu’est-ce qu’une ``PRIMARY KEY``, une ``FOREIGN KEY`` ?**
+```SQL
 
+ALTER TABLE Customers
+ADD email VARCHAR(255);
+
+ALTER TABLE Customers
+DROP COLUMN age;
+
+ALTER TABLE Customers
+RENAME COLUMN firstname TO user_name;
+
+```
 
 - **Que signifient ``UNIQUE``, ``NOT NULL``, ``DEFAULT``, ``CHECK`` ?**
 
+``UNIQUE`` signifie que la colonne doit avoir une donnée obligatoirement unique (pas de doublon).
 
-- **Comment ajouter une contrainte après la création ?**
+``NOT NULL`` signifie que la colonne ne peut pas contenir une valeur ``NULL``.
 
+``DEFAULT`` signifie qu'une valeur par défaut est utilisée si aucune n’est fournie lors de l’insertion.
+
+``CHECK`` est une contrainte. Elle impose une condition logique à respecter pour insérer une valeur dans une colonne.
+
+```SQL
+
+CREATE TABLE Persons (
+    ID INT UNIQUE NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    FirstName VARCHAR(255),
+    Age INT CHECK (Age >= 18),
+    City VARCHAR(255) DEFAULT 'Aix-les-Bains'
+);
+
+-- Cette table impose que chaque personne ait au moins 18 ans et que la ville par défaut soit "Aix-les-Bains".
+
+```
+
+- **Comment ajouter une contrainte ?**
+
+Les contraintes peuvent être spécifiées lors de la création d'une table avec l'instruction ``CREATE TABLE`` ou après la création de la table avec l'instruction ``ALTER TABLE``.
+
+```SQL
+
+-- Exemple lors de la création
+CREATE TABLE Products (
+    product_id INT PRIMARY KEY,
+    price DECIMAL(10, 2) CHECK (price > 0)
+);
+
+-- Exemple après création
+ALTER TABLE Products
+ADD CONSTRAINT price_positive CHECK (price > 0);
+
+```
 
 - **Que fait ``ON DELETE CASCADE`` ?**
 
+La clause ``ON DELETE CASCADE`` indique que si une ligne référencée dans la table principale est supprimée, toutes les lignes associées dans les tables dépendantes le seront aussi automatiquement. Par exemple si un utilisateur supprime son compte sur un forum, ses publications seront également supprimées.
+
+```SQL
+
+FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+
+```
 
 - **Peut-on insérer plusieurs lignes avec une seule instruction ``INSERT`` ?**
 
+Oui, il est possible d'insérer plusieurs lignes avec une seule instruction ``INSERT``.
+
+```SQL
+
+INSERT INTO users (user_id, nom, email)
+VALUES 
+  (1, 'Alice', 'alice@example.com'),
+  (2, 'Bob', 'bob@example.com'),
+  (3, 'Charlie', 'charlie@example.com');
+
+```
 
 ## Sécurité SQL & Injections
 
