@@ -446,14 +446,66 @@ WHERE salary = (
 
 - **Qu’est-ce qu’une clé primaire ?**
 
+Une clé primaire (``pk`` pour ``primary key``) est un identifiant unique pour chaque ligne d'une table. Elle est obligatoire, unique (pas de doublon) et ne peut avoir pour valeur ``NULL``. Elle permet d’identifier de manière fiable une ligne dans une table
+
+```SQL
+
+CREATE TABLE `users` (
+    `user_id` INT NOT NULL AUTO_INCREMENT,
+    `nom` VARCHAR(50),
+    `email` VARCHAR(50),
+    `date_inscription` DATE,
+    PRIMARY KEY (`user_id`)
+);
+
+```
+
 - **Qu’est-ce qu’une clé étrangère ?**
+
+Une clé étrangère (``fk`` pour ``foreign key``) est un champ (ou groupe de champs) dans une table qui référence la clé primaire ``pk`` d'une autre table. Elle établit une relation entre deux tables.
+
+```SQL
+
+CREATE TABLE Orders (
+    order_id INT NOT NULL,
+    order_number INT NOT NULL,
+    user_id INT,
+    PRIMARY KEY (order_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+```
 
 - **Qu’est-ce qu’un index ? Et pourquoi en créer un ?**
 
+Un index est une structure de données qui accélère les recherches dans une table (de manière similaire à l’index d’un livre).
+
+```SQL
+
+CREATE INDEX idx_email ON users(email);
+
+```
+
 - **Que fait ``AUTO_INCREMENT`` ou ``SERIAL`` ?**
+  
+``AUTO_INCREMENT`` (avec MySQL) ou ``SERIAL`` (avec PostgreSQL) permet de générer automatiquement des identifiants uniques en incrémentant une valeur à chaque nouvelle ligne. Cela garantit des valeurs croissantes sans saisie manuelle.
+
+```SQL
+
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    ...
+);
+
+```
 
 - **Quelle est la différence entre ``VARCHAR`` et ``TEXT`` ?**
+  
+``VARCHAR`` et ``TEXT`` sont deux types de données utilisés pour stocker du texte en BDD.
 
+``VARCHAR(n)`` est utilisé pour stocker des chaînes de caractères dont la longueur maximale est connue et/ou limitée. On doit spécifier une taille maximale ``(n)`` (ex: ``VARCHAR(100)``) pour une chaîne de 100 caractères maximum. Ce type est très courant pour les noms, titres, etc. Le contenu est stocké directement dans la ligne de la table, ce qui rend les accès rapides. ``VARCHAR`` peut également être indexé, ce qui permet d’optimiser les recherches sur cette colonne.
+
+``TEXT`` est destiné, quant à lui, à des contenus textuels beaucoup plus longs comme des descriptions, des commentaires ou des articles par exemple. Il comporte des variantes selon le nombre de caractères nécessaires (``MEDIUMTEXT``, ``LONGTEXT``). Contrairement à ``VARCHAR``, les champs de type ``TEXT`` sont souvent stockés à part de la ligne principale de la table, ce qui peut ralentir légèrement l'accès. De plus, ``TEXT`` ne peut pas être entièrement indexé, ce qui peut limiter certaines opérations (comme les tris ou recherches complexes).
 
 ## Création, modification et contraintes
 
