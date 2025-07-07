@@ -349,15 +349,98 @@ SELECT COUNT(product_name) FROM products;
 
 - **Qu’est-ce qu’une sous-requête ? Où peut-on l’utiliser ?**
 
+Une sous-requête (ou requête imbriquée) est une requête SQL insérée à l'intérieur d'une autre requête, généralement dans les clauses ``WHERE``, ``FROM`` ou ``SELECT``.
+
+Elle est souvent utilisée pour comparer une valeur à un résultat calculé (``WHERE`` / ``HAVING``), filtrer selon un ensemble (``IN``) ou ajouter des colonnes calculées (``SELECT``).
+
+```SQL
+
+SELECT * FROM employee
+WHERE salary > (
+    SELECT avg(salary)
+    FROM employee
+);
+-- Renvoie les employé·es gagnant plus que le salaire moyen
+
+```
 
 - **Quelle est la différence entre une sous-requête corrélée et non corrélée ?**
 
+Une sous-requête non corrélée s'exécute indépendamment de la requête principale et est évaluée 1 seule fois.
+
+Une sous-requête corrélée dépend de la requête principale et est réévaluée à chaque ligne de la requête externe. Elle contient une référence à une colonne de la requête principale.
+
+```SQL
+
+SELECT 
+  e1.firstname,
+  e1.lastname,
+  e1.salary,
+  (
+    SELECT AVG(e2.salary)
+    FROM employee e2
+    WHERE e2.dep_id = e1.dep_id
+  ) AS avg_dept_salary
+FROM employee e1;
+-- Renvoie la moyenne des salaires par département
+-- Ici, la sous-requête dépend du département de chaque employé. La moyenne est recalculée pour chaque département.
+
+```
 
 - **À quoi sert l’opérateur ``IN`` dans une sous-requête ?**
 
+L'opérateur ``IN`` permet de filtrer les lignes dont une valeur correspond à l'une des valeurs retournées dans une sous-requête.
+
+```SQL
+
+SELECT product_name
+FROM products
+WHERE category_id IN (
+    SELECT category_id
+    FROM categories
+    WHERE category_name IN ('Electronics', 'Books')
+);
+-- Renvoie tous les produits dont la catégorie est parmi celles ayant pour nom "Electronics" ou "Books".
+
+```
 
 - **Quelle est la différence entre ``EXISTS``, ``IN`` et ``= (SELECT...)`` ?**
 
+``EXISTS`` vérifie si la sous-requête retourne au moins une ligne. Ne regarde pas le contenu, juste la présence.
+
+``IN`` vérifie si une valeur est dans une liste de résultats. C'est utile avec une sous-requête qui retourne plusieurs lignes, une colonne.
+
+``= (SELECT...)`` est utilisé si la sous-requête retourne une seule valeur (une seule ligne, une seule colonne). On est sur une comparaison directe.
+
+```SQL
+
+SELECT * 
+FROM employee 
+WHERE dep_id IN (
+  SELECT dep_id 
+  FROM department 
+  WHERE location = 'Paris'
+);
+-- Renvoie tous les employés dans un département précis de Paris
+
+SELECT * 
+FROM customer
+WHERE EXISTS (
+  SELECT 1
+  FROM orders
+  WHERE orders.customer_id = customer.customer_id
+);
+-- Renvoie tous les clients ayant passé au moins une commande
+
+SELECT * 
+FROM employee 
+WHERE salary = (
+  SELECT AVG(salary) 
+  FROM employee
+);
+-- Renvoie tous les employés gagnant exactement le salaire moyen
+
+```
 
 ## Modélisation et structure
 
