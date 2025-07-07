@@ -643,15 +643,97 @@ VALUES
 
 - **Peut-on faire une injection SQL même sans champ de formulaire texte ? Comment ?**
 
-
 ## Autres notions utiles
 
 - **Comment supprimer une table sans erreur si elle n’existe pas ?**
 
+On peut utiliser ``DROP TABLE IF EXISTS`` pour supprimer une table uniquement si elle existe, ce qui évite les erreurs.
+
+```SQL
+
+DROP TABLE IF EXISTS Orders;
+
+```
+
 - **Quelle est la différence entre ``DELETE``, ``TRUNCATE`` et ``DROP`` ?**
+
+``DELETE`` supprime une ligne existante dans une table, mais conserve la structure de la dite table. Cela peut cibler des lignes spécifiques avec une clause ``WHERE``.
+
+``TRUNCATE`` supprime toutes les lignes d’une table, mais pas la table elle-même. La structure de la table est conservée.
+
+``DROP`` supprime complètement la table, son contenu ainsi que sa structure. Elle n'existe plus après l'exécution.
+
+```SQL
+
+DELETE FROM Customers WHERE CustomerName='Alfreds Futterkiste';
+
+TRUNCATE TABLE Persons;
+
+DROP TABLE Orders;
+
+```
 
 - **Que signifie ``UNION`` ? Quelle est la différence avec ``UNION ALL`` ?**
 
+La commande ``UNION`` permet de mettre bout-à-bout / combiner les résultats de plusieurs requêtes ``SELECT``. Les colonnes doivent avoir le même nombre, même ordre et types de données compatibles.
+
+Par défaut, les enregistrements exactement identiques ne seront pas répétés dans les résultats. (Cela élimine automatiquement les doublons.) Pour effectuer une union dans laquelle même les lignes dupliquées sont affichées il faut utiliser la commande ``UNION ALL``.
+
+```SQL
+
+SELECT * FROM magasin1_client
+UNION
+SELECT * FROM magasin2_client
+
+-- Si magasin1_client contient Léon, Marcel, Sophie, Camille
+-- Et que magasin2_client Marion, Marcel, Paul, Camille
+-- On aura un résultat sans doublon : Léon, Marcel, Sophie, Camille, Marion, Paul
+
+SELECT * FROM magasin1_client
+UNION ALL
+SELECT * FROM magasin2_client
+
+-- Si magasin1_client contient Léon, Marcel, Sophie, Camille
+-- Et que magasin2_client Marion, Marcel, Paul, Camille
+-- On aura un résultat avec doublon : Léon, Marcel, Sophie, Camille, Marion, Marcel, Paul, Camille
+
+```
+
 - **Que fait une ``VIEW`` ?**
 
+``VIEW`` (ou vue) est une table virtuelle basée sur le résultat d'une requête SQL. Elle ne stocke pas physiquement les données, mais affiche dynamiquement le résultat à chaque appel. Une vue est créée avec l'instruction ``CREATE VIEW``.
+
+```SQL
+
+CREATE VIEW [France Customers] AS
+SELECT CustomerName, ContactName
+FROM Customers
+WHERE Country = 'France';
+-- Crée une vue montrant tous les clients basés en France
+
+```
+
 - **À quoi servent ``BEGIN``, ``COMMIT``, ``ROLLBACK`` ?**
+
+Ces mots-clés sont utilisés pour gérer des transactions, c’est-à-dire un ensemble d’opérations SQL traitées comme une unité.
+
+Si une opération échoue sans qu'il y ait de transaction, vous risquez des données incohérentes (ex: de l'argent déduit mais non crédité). En regroupant ces étapes dans une transaction, vous vous assurez que les deux opérations réussissent ou qu'aucune n'est appliquée.
+
+``BEGIN`` (ou ``BEGIN TRANSACTION``) : Marque le début d'une transaction. Toutes les opérations ultérieures feront partie de cette transaction.
+
+``COMMIT`` : Valide les modifications de la transaction, rendant toutes les modifications permanentes dans la base de données.
+
+``ROLLBACK`` : Annule toutes les opérations de la transaction en cours et ramène la base de données à son état antérieur en cas d'erreur ou d'échec.
+
+```SQL
+
+BEGIN;
+
+UPDATE Accounts SET balance = balance - 100 WHERE user_id = 1;
+UPDATE Accounts SET balance = balance + 100 WHERE user_id = 2;
+
+COMMIT;
+-- Les deux opérations sont confirmées ensemble.
+-- Si une erreur survient, on peut utiliser ROLLBACK au lieu de COMMIT.
+
+```
