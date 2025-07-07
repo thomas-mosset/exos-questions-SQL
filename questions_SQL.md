@@ -511,24 +511,103 @@ CREATE TABLE users (
 
 - **Comment créer une table avec ``CREATE TABLE`` ?**
 
+Pour créer une table, on utilise  ``CREATE TABLE`` suivi du nom de la table, puis on définit les colonnes et leurs types. On peut aussi ajouter des contraintes comme une clé primaire (``PRIMARY KEY``) ou une clé étrangère (``FOREIGN KEY``).
+
+```SQL
+
+CREATE TABLE Orders (
+    order_id INT NOT NULL,
+    order_number INT NOT NULL,
+    user_id INT,
+    PRIMARY KEY (order_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+-- Ici, user_id fait référence à la colonne user_id de la table users.
+
+```
 
 - **Comment modifier une table avec ``ALTER TABLE`` ?**
 
+L'instruction ``ALTER TABLE`` permet d'ajouter, de supprimer ou de modifier une colonne dans une table existante. Elle permet également d'ajouter et de supprimer une contrainte sur une table existante.
 
-- **Qu’est-ce qu’une ``PRIMARY KEY``, une ``FOREIGN KEY`` ?**
+```SQL
 
+ALTER TABLE Customers
+ADD email VARCHAR(255);
+
+ALTER TABLE Customers
+DROP COLUMN age;
+
+ALTER TABLE Customers
+RENAME COLUMN firstname TO user_name;
+
+```
 
 - **Que signifient ``UNIQUE``, ``NOT NULL``, ``DEFAULT``, ``CHECK`` ?**
 
+``UNIQUE`` signifie que la colonne doit avoir une donnée obligatoirement unique (pas de doublon).
 
-- **Comment ajouter une contrainte après la création ?**
+``NOT NULL`` signifie que la colonne ne peut pas contenir une valeur ``NULL``.
 
+``DEFAULT`` signifie qu'une valeur par défaut est utilisée si aucune n’est fournie lors de l’insertion.
+
+``CHECK`` est une contrainte. Elle impose une condition logique à respecter pour insérer une valeur dans une colonne.
+
+```SQL
+
+CREATE TABLE Persons (
+    ID INT UNIQUE NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    FirstName VARCHAR(255),
+    Age INT CHECK (Age >= 18),
+    City VARCHAR(255) DEFAULT 'Aix-les-Bains'
+);
+
+-- Cette table impose que chaque personne ait au moins 18 ans et que la ville par défaut soit "Aix-les-Bains".
+
+```
+
+- **Comment ajouter une contrainte ?**
+
+Les contraintes peuvent être spécifiées lors de la création d'une table avec l'instruction ``CREATE TABLE`` ou après la création de la table avec l'instruction ``ALTER TABLE``.
+
+```SQL
+
+-- Exemple lors de la création
+CREATE TABLE Products (
+    product_id INT PRIMARY KEY,
+    price DECIMAL(10, 2) CHECK (price > 0)
+);
+
+-- Exemple après création
+ALTER TABLE Products
+ADD CONSTRAINT price_positive CHECK (price > 0);
+
+```
 
 - **Que fait ``ON DELETE CASCADE`` ?**
 
+La clause ``ON DELETE CASCADE`` indique que si une ligne référencée dans la table principale est supprimée, toutes les lignes associées dans les tables dépendantes le seront aussi automatiquement. Par exemple si un utilisateur supprime son compte sur un forum, ses publications seront également supprimées.
+
+```SQL
+
+FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+
+```
 
 - **Peut-on insérer plusieurs lignes avec une seule instruction ``INSERT`` ?**
 
+Oui, il est possible d'insérer plusieurs lignes avec une seule instruction ``INSERT``.
+
+```SQL
+
+INSERT INTO users (user_id, nom, email)
+VALUES 
+  (1, 'Alice', 'alice@example.com'),
+  (2, 'Bob', 'bob@example.com'),
+  (3, 'Charlie', 'charlie@example.com');
+
+```
 
 ## Sécurité SQL & Injections
 
@@ -564,15 +643,97 @@ CREATE TABLE users (
 
 - **Peut-on faire une injection SQL même sans champ de formulaire texte ? Comment ?**
 
-
 ## Autres notions utiles
 
 - **Comment supprimer une table sans erreur si elle n’existe pas ?**
 
+On peut utiliser ``DROP TABLE IF EXISTS`` pour supprimer une table uniquement si elle existe, ce qui évite les erreurs.
+
+```SQL
+
+DROP TABLE IF EXISTS Orders;
+
+```
+
 - **Quelle est la différence entre ``DELETE``, ``TRUNCATE`` et ``DROP`` ?**
+
+``DELETE`` supprime une ligne existante dans une table, mais conserve la structure de la dite table. Cela peut cibler des lignes spécifiques avec une clause ``WHERE``.
+
+``TRUNCATE`` supprime toutes les lignes d’une table, mais pas la table elle-même. La structure de la table est conservée.
+
+``DROP`` supprime complètement la table, son contenu ainsi que sa structure. Elle n'existe plus après l'exécution.
+
+```SQL
+
+DELETE FROM Customers WHERE CustomerName='Alfreds Futterkiste';
+
+TRUNCATE TABLE Persons;
+
+DROP TABLE Orders;
+
+```
 
 - **Que signifie ``UNION`` ? Quelle est la différence avec ``UNION ALL`` ?**
 
+La commande ``UNION`` permet de mettre bout-à-bout / combiner les résultats de plusieurs requêtes ``SELECT``. Les colonnes doivent avoir le même nombre, même ordre et types de données compatibles.
+
+Par défaut, les enregistrements exactement identiques ne seront pas répétés dans les résultats. (Cela élimine automatiquement les doublons.) Pour effectuer une union dans laquelle même les lignes dupliquées sont affichées il faut utiliser la commande ``UNION ALL``.
+
+```SQL
+
+SELECT * FROM magasin1_client
+UNION
+SELECT * FROM magasin2_client
+
+-- Si magasin1_client contient Léon, Marcel, Sophie, Camille
+-- Et que magasin2_client Marion, Marcel, Paul, Camille
+-- On aura un résultat sans doublon : Léon, Marcel, Sophie, Camille, Marion, Paul
+
+SELECT * FROM magasin1_client
+UNION ALL
+SELECT * FROM magasin2_client
+
+-- Si magasin1_client contient Léon, Marcel, Sophie, Camille
+-- Et que magasin2_client Marion, Marcel, Paul, Camille
+-- On aura un résultat avec doublon : Léon, Marcel, Sophie, Camille, Marion, Marcel, Paul, Camille
+
+```
+
 - **Que fait une ``VIEW`` ?**
 
+``VIEW`` (ou vue) est une table virtuelle basée sur le résultat d'une requête SQL. Elle ne stocke pas physiquement les données, mais affiche dynamiquement le résultat à chaque appel. Une vue est créée avec l'instruction ``CREATE VIEW``.
+
+```SQL
+
+CREATE VIEW [France Customers] AS
+SELECT CustomerName, ContactName
+FROM Customers
+WHERE Country = 'France';
+-- Crée une vue montrant tous les clients basés en France
+
+```
+
 - **À quoi servent ``BEGIN``, ``COMMIT``, ``ROLLBACK`` ?**
+
+Ces mots-clés sont utilisés pour gérer des transactions, c’est-à-dire un ensemble d’opérations SQL traitées comme une unité.
+
+Si une opération échoue sans qu'il y ait de transaction, vous risquez des données incohérentes (ex: de l'argent déduit mais non crédité). En regroupant ces étapes dans une transaction, vous vous assurez que les deux opérations réussissent ou qu'aucune n'est appliquée.
+
+``BEGIN`` (ou ``BEGIN TRANSACTION``) : Marque le début d'une transaction. Toutes les opérations ultérieures feront partie de cette transaction.
+
+``COMMIT`` : Valide les modifications de la transaction, rendant toutes les modifications permanentes dans la base de données.
+
+``ROLLBACK`` : Annule toutes les opérations de la transaction en cours et ramène la base de données à son état antérieur en cas d'erreur ou d'échec.
+
+```SQL
+
+BEGIN;
+
+UPDATE Accounts SET balance = balance - 100 WHERE user_id = 1;
+UPDATE Accounts SET balance = balance + 100 WHERE user_id = 2;
+
+COMMIT;
+-- Les deux opérations sont confirmées ensemble.
+-- Si une erreur survient, on peut utiliser ROLLBACK au lieu de COMMIT.
+
+```
