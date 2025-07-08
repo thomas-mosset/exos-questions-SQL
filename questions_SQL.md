@@ -613,35 +613,129 @@ VALUES
 
 - **Qu’est-ce qu’une injection SQL ?**
 
+Une injection SQL est une attaque consistant à insérer du code SQL malveillant dans une requête via une entrée utilisateur non sécurisée. L'objectif peut être de contourner l'authentification, d'accéder à des données sensibles, de modifier ou supprimer des données, voire de compromettre l'ensemble de la base de données. C’est l’une des vulnérabilités les plus répandues dans les applications web mal sécurisées.
 
 - **Donne un exemple simple d’injection SQL sur une requête ``SELECT``.**
 
+```javascript
+
+txtUserId = getRequestString("UserId");
+txtSQL = "SELECT * FROM Users WHERE UserId = " + txtUserId;
+
+```
+
+Si un utilisateur entre :
+
+```md
+
+105 OR 1=1
+
+```
+
+La requête devient :
+
+```SQL
+
+SELECT * FROM Users WHERE UserId = 105 OR 1=1;
+
+```
+
+Résultat : tous les utilisateurs sont renvoyés, car ``1=1`` est toujours vrai.
 
 - **Pourquoi la concaténation directe de chaînes dans une requête SQL est-elle dangereuse ?**
 
+Parce qu’elle permet à un utilisateur malveillant d’injecter directement du code SQL dans la requête. Cela ouvre la porte à des attaques comme la lecture non autorisée de données, la modification ou la suppression de tables, voire la prise de contrôle totale de la base.
 
 - **Quelle différence entre une requête SQL classique et une requête préparée ?**
 
+Une requête classique insère directement les valeurs dans la chaîne SQL, ce qui est risqué.
+
+Une requête préparée sépare le code SQL et les données. Elle est d’abord compilée avec des espaces réservés (placeholders), puis les valeurs sont injectées de manière sécurisée.
+
+La requête préparée est plus sécurisée, plus performante si la requête est répétée (car compilée une seule fois) et mobilise moins de trafic réseau (car seuls les paramètres changent).
+
+```SQL
+
+PREPARE stmt FROM 'SELECT * FROM Users WHERE UserId = ?';
+EXECUTE stmt USING @userId;
+
+```
 
 - **Comment les requêtes paramétrées préviennent-elles les injections SQL ?**
 
+Elles traitent les entrées utilisateur comme des données, et non comme du code SQL. Ainsi, même si un utilisateur tente d’injecter du code, celui-ci sera considéré comme une simple chaîne de caractères et non interprété comme une commande SQL.
 
 - **Citer des bonnes pratiques pour sécuriser une base de données contre les injections.**
 
+Utiliser des requêtes préparées (paramétrées) partout.
+
+Valider et filtrer les entrées utilisateur, côté front-end et back-end.
+
+Éviter les concaténations dynamiques dans les requêtes SQL.
+
+Limiter les droits utilisateurs en BDD selon le principe du moindre privilège (*least privilege*).
+
+Journaliser les requêtes suspectes et utiliser des outils de détection d'injection.
+
+Éviter les messages d’erreur trop explicites, qui donnent des indices aux attaquants.
 
 - **Que faut-il éviter dans la gestion des privilèges utilisateur en base de données ?**
 
+Ne pas accorder plus de droits que nécessaire (principe du least privilege).
+
+Un utilisateur standard ne doit pas pouvoir supprimer ou modifier des données critiques.
+
+Éviter d’utiliser un compte admin ou *root* pour les connexions applicatives.
 
 - **Quelle est la différence entre l'échappement manuel et l'utilisation de paramètres liés dans une requête ?**
 
+L'échappement manuel consiste à filtrer ou neutraliser les caractères spéciaux (``'``, ``"``, ``;``, etc.). Cette méthode est fragile et sujette à oubli.
+
+Les paramètres liés sont plus sûrs. Le moteur SQL traite les valeurs indépendamment du code, ce qui rend l’injection impossible.
 
 - **Quels types de commandes malveillantes peut-on injecter si une requête n’est pas sécurisée ?**
 
+```SQL
+
+-- Contournement de login :
+admin' OR '1'='1
+
+-- Modification de données :
+UPDATE Accounts SET balance = 0 WHERE user_id = 1;
+
+-- Lecture de données sensibles :
+SELECT * FROM users WHERE name = '' OR '1'='1'
+
+-- Suppression de données :
+'; DROP TABLE Users; --
+
+```
 
 - **Qu’est-ce que le SQL ``tautology-based attack`` (attaque basée sur les tautologies) ?**
 
+Une attaque basée sur les tautologies est une injection qui repose sur l’insertion d’expressions toujours vraies (comme ``1=1`` ou ``'a'='a'``) dans une clause ``WHERE``. Elle permet de contourner l’authentification ou de récupérer des données non autorisées.
+
+```SQL
+
+SELECT * FROM users WHERE username = 'admin' AND password = '123' OR '1'='1';
+
+-- Ici, '1'='1' rend la condition toujours vraie, ce qui peut permettre un accès sans mot de passe valide.
+
+```
 
 - **Peut-on faire une injection SQL même sans champ de formulaire texte ? Comment ?**
+
+Oui. Toute entrée utilisateur non sécurisée est une porte d’entrée potentielle :
+
+Paramètres d’URL (GET). Par exemple : ``https://site.com/users?user_id=105 OR 1=1``
+
+Cookies. Par exemple : ``Set-Cookie: sessionid=' OR '1'='1``
+
+Headers HTTP (User-Agent, Referer…).
+
+Champs cachés dans les formulaires.
+
+Données JSON/XML dans les requêtes API.
 
 ## Autres notions utiles
 
