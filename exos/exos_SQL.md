@@ -18,7 +18,7 @@
 - Compter le nombre total de clients.  
 - Calculer la moyenne des salaires dans la table `users`.  
 - Afficher le nombre de commandes par client.  
-- Afficher les catégories de produits avec un total de ventes supérieur à 10 000.
+- Afficher les catégories de produits avec un total de stock supérieur à 60.
 
 ## 4. Jointures
 
