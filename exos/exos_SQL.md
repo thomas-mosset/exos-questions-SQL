@@ -9,14 +9,14 @@
 
 ## 2. Filtres et conditions
 
-- Afficher tous les employés dont le nom commence par un "J".  
+- Afficher tous les utilisateurs dont le nom commence par un "J".  
 - Récupérer les commandes dont la date est comprise entre le 1er janvier et le 31 mars 2024.  
-- Sélectionner tous les articles dont le prix est supérieur à 100 *ou* dont la catégorie est "Accessoires".
+- Sélectionner toutes les commandes produits dont le prix est supérieur à 100.
 
 ## 3. Agrégations et groupements
 
 - Compter le nombre total de clients.  
-- Calculer la moyenne des salaires dans la table `employes`.  
+- Calculer la moyenne des salaires dans la table `users`.  
 - Afficher le nombre de commandes par client.  
 - Afficher les catégories de produits avec un total de ventes supérieur à 10 000.
 
@@ -34,7 +34,7 @@
 
 ## 6. Manipulation de données
 
-- Insérer un nouvel employé dans la table `employes`.  
+- Insérer un nouvel employé dans la table `users`.  
 - Mettre à jour le stock d’un produit donné.  
 - Supprimer tous les clients inactifs depuis 2 ans.
 
