@@ -46,3 +46,22 @@ SELECT category, SUM(stock) AS total_stock
 FROM products
 GROUP BY category
 HAVING SUM(stock) > 60;
+
+-- Jointures
+
+--- Récupérer les noms des clients et leurs commandes (tables clients et commandes).
+SELECT clients.client_name, orders.*
+FROM clients
+JOIN orders ON orders.client_id = clients.id;
+
+
+--- Afficher les produits commandés avec leur nom, quantité et prix unitaire (tables produits, commandes, commandes_produits).
+SELECT products.product_name, products_orders.quantity, products_orders.solo_price
+FROM products_orders
+JOIN products ON products_orders.product_id = products.id;
+
+--- Récupère les clients sans commande.
+SELECT clients.client_name, clients.town
+FROM clients
+LEFT JOIN orders ON orders.client_id = clients.id
+WHERE orders.id IS NULL;

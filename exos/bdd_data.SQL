@@ -12,7 +12,8 @@ VALUES
 ('Client A', 'Paris', TRUE),
 ('Client B', 'Nantes', TRUE),
 ('Client C', 'Annecy', FALSE),
-('Client D', 'Aix-Les-Bains', TRUE);
+('Client D', 'Aix-Les-Bains', TRUE),
+('Client E', 'Auray', TRUE);
 
 -- TABLE products
 INSERT INTO products (product_name, category, stock)
