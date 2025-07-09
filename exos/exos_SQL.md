@@ -40,9 +40,9 @@
 
 ## 7. Structure de base de données
 
-- Créer une table `utilisateurs` avec une clé primaire et un champ email unique.  
-- Ajouter une colonne `date_naissance` à la table `clients`.  
-- Supprimer la table `temp_logs`.
+- Créer une table `vendeurs` (``sellers``)  avec une clé primaire et un champ email unique.  
+- Ajouter une colonne `vendeur_nom` à la table `clients`.  
+- Supprimer la table `sellers`.
 
 ## 8. Transactions et vues
 

@@ -103,4 +103,22 @@ UPDATE products
 SET stock = 80
 WHERE product_name = 'Laptop';
 
---- Supprimer tous les clients inactifs depuis 2 ans.
+--- Supprimer tous les clients inactifs.
+DELETE FROM clients
+WHERE active = FALSE;
+
+
+-- Structure de base de données
+
+--- Créer une table vendeurs (sellers) avec une clé primaire et un champ email unique.
+CREATE TABLE sellers (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE
+);
+
+--- Ajouter une colonne vendeur_nom à la table sellers.
+ALTER TABLE sellers 
+ADD COLUMN seller_name VARCHAR(100);
+
+--- Supprimer la table sellers.
+DROP TABLE sellers;
