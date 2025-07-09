@@ -36,7 +36,7 @@
 
 - Insérer un nouvel employé dans la table `users`.  
 - Mettre à jour le stock d’un produit donné.  
-- Supprimer tous les clients inactifs depuis 2 ans.
+- Supprimer tous les clients inactifs.
 
 ## 7. Structure de base de données
 

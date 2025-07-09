@@ -90,3 +90,17 @@ WHERE id IN (
     SELECT client_id
     FROM orders
 );
+
+-- Manipulation de données
+
+--- Insérer un nouvel employé dans la table users.
+INSERT INTO users (user_name, email, age, income)
+VALUES
+('Thomas', 'thomas@mail.com', 30, 28000);
+
+--- Mettre à jour le stock d’un produit donné.
+UPDATE products
+SET stock = 80
+WHERE product_name = 'Laptop';
+
+--- Supprimer tous les clients inactifs depuis 2 ans.
