@@ -122,3 +122,25 @@ ADD COLUMN seller_name VARCHAR(100);
 
 --- Supprimer la table sellers.
 DROP TABLE sellers;
+
+
+-- Transactions et vues
+
+--- Écrire une transaction qui retire un montant d’un compte et l’ajoute à un autre.
+BEGIN;
+
+UPDATE Accounts SET balance = balance - 100 WHERE user_id = 1;
+UPDATE Accounts SET balance = balance + 100 WHERE user_id = 2;
+
+COMMIT;
+
+--- Créer une vue `ventes_mensuelles` affichant les ventes par mois.
+CREATE VIEW ventes_mensuelles AS
+SELECT
+    DATE_FORMAT(order_date, '%Y-%m') AS mois,
+    SUM(total) AS total_ventes
+FROM orders
+GROUP BY mois;
+
+--- Créer un index sur la colonne `email` de la table `utilisateurs`.
+CREATE INDEX idx_users_email ON users (email);
