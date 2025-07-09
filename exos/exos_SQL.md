@@ -29,8 +29,8 @@
 ## 5. Sous-requêtes
 
 - Afficher les utilisateurs dont le salaire est supérieur à la moyenne des salaires.  
-- Récupérer les produits les plus chers de chaque catégorie.  
-- Sélectionner les clients qui ont passé plus de 3 commandes.
+- Affiche les noms des produits dont le stock est strictement supérieur à la moyenne des stocks de tous les produits. 
+- Affiche les noms des clients dont l’id existe dans la table orders (donc qui ont au moins une commande).
 
 ## 6. Manipulation de données
 

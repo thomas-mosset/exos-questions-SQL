@@ -65,3 +65,28 @@ SELECT clients.client_name, clients.town
 FROM clients
 LEFT JOIN orders ON orders.client_id = clients.id
 WHERE orders.id IS NULL;
+
+
+-- Sous-requêtes
+
+--- Afficher les utilisateurs dont le salaire est supérieur à la moyenne des salaires.
+SELECT * FROM users
+WHERE income > (
+    SELECT AVG(income)
+    FROM users
+);
+
+--- Affiche les noms des produits dont le stock est strictement supérieur à la moyenne des stocks de tous les produits.
+SELECT product_name FROM products
+WHERE stock > (
+    SELECT AVG(stock)
+    FROM products
+);
+
+--- Affiche les noms des clients dont l’id existe dans la table orders (donc qui ont au moins une commande).
+SELECT client_name
+FROM clients
+WHERE id IN (
+    SELECT client_id
+    FROM orders
+);
